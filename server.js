@@ -86,6 +86,18 @@ const viewDepartments = async () => {
     mainMenu(); // Return to main menu
 };
 
+// View Roles Function
+const viewRoles = async () => {
+    try { // Try to query database for all roles
+        const [roles] = await getDb().query('SELECT * FROM role');
+        console.table(roles);
+    } catch (error) { // Catch and display any errors
+        console.error('Error fetching roles:', error);
+    }
+    mainMenu(); // Return to main menu
+};
+
+
 mainMenu();
 
 // Listen for server connection
