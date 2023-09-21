@@ -166,6 +166,50 @@ const addDepartment = async () => {
     mainMenu(); // Return to main menu
 };
 
+// Add Role Function
+const addRole = async () => {
+    try { // Try to query database for all departments
+        const [departments] = await getDb().query('SELECT * FROM department');
+        const departmentChoices = departments.map(({ id, name }) => ({ name: name, value: id }));
+        const { roleName, roleSalary, departmentId } = await inquirer.prompt([
+            {
+                type: 'input',
+                name: 'roleName',
+                message: 'What is the name of the role?'
+            },
+            {
+                type: 'input',
+                name: 'roleSalary',
+                message: 'What is the salary of the role?'
+            },
+            {
+                type: 'list',
+                name: 'departmentId',
+                message: 'What department does the role belong to?',
+                choices: departmentChoices
+            }
+        ])
+        // Add role to database
+        await getDb().query('INSERT INTO role SET ?', { title: roleName, salary: roleSalary, department_id: departmentId});
+        console.log('Role added successfully!');
+    } catch (error) { // Catch and display any errors
+        console.error('Error adding role:', error);
+    }
+    // ask if role is a manager role
+    const { isManager } = await inquirer.prompt([
+        {
+            type: 'confirm',
+            name: 'isManager',
+            message: 'Is this role a manager role?'
+        }
+    ])
+    if (isManager) { // If role is a manager role, it is added to the managerIDs array for use in the addEmployee function
+        const [[result]] = await getDb().query('SELECT LAST_INSERT_ID() as id');
+        managerIDs.push(result.id);
+    }    
+    mainMenu(); // Return to main menu
+};
+
 mainMenu();
 
 // Listen for server connection
