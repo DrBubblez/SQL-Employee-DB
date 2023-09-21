@@ -97,6 +97,55 @@ const viewRoles = async () => {
     mainMenu(); // Return to main menu
 };
 
+// Add Employee Function
+// Establishing pre-set manager IDs but allowing for more to be added
+let managerIDs = [1, 3, 5, 6, 8, 10, 12, 14, 16, 17];
+const addEmployee = async () => {
+    try { // Try to query database for all roles
+        const [roles] = await getDb().query('SELECT * FROM role');
+        const roleChoices = roles.map(({ id, title }) => ({ name: title, value: id }));
+        const { firstName, lastName, roleId } = await inquirer.prompt([
+            {
+                type: 'input',
+                name: 'firstName',
+                message: 'What is the employee\'s first name?'
+            },
+            {
+                type: 'input',
+                name: 'lastName',
+                message: 'What is the employee\'s last name?'
+            },
+            {
+                type: 'list',
+                name: 'roleId',
+                message: 'What is the employee\'s role?',
+                choices: roleChoices
+            }
+        ]);
+
+        // Query database for employees with a manager ID
+        const [managers] = await getDb().query('SELECT id, CONCAT(first_name, " ", last_name) AS fullname FROM employee WHERE role_id IN (?)', [managerIDs]);
+        const managerChoices = managers.map(({ id, fullname }) => ({ name: fullname, value: id }));
+        managerChoices.push({ name: 'No Manager', value: null });
+
+        // Get manager ID from user
+        const { managerId } = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'managerId',
+                message: 'Who is the employee\'s manager?',
+                choices: managerChoices
+            }
+        ]);
+
+        // Add employee to database
+        await getDb().query('INSERT INTO employee SET ?', { first_name: firstName, last_name: lastName, role_id: roleId, manager_id: managerId });
+        console.log('Employee added successfully!');
+    } catch (error) { // Catch and display any errors
+        console.error('Error adding employee:', error);
+    }
+    mainMenu(); // Return to main menu
+};
 
 mainMenu();
 
