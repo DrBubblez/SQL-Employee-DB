@@ -75,6 +75,17 @@ const viewEmployees = async () => {
     mainMenu(); // Return to main menu
 };
 
+// View Departments Function
+const viewDepartments = async () => {
+    try { // Try to query database for all departments
+        const [departments] = await getDb().query('SELECT * FROM department');
+        console.table(departments);
+    } catch (error) { // Catch and display any errors
+        console.error('Error fetching departments:', error);
+    }
+    mainMenu(); // Return to main menu
+};
+
 mainMenu();
 
 // Listen for server connection
