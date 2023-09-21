@@ -147,6 +147,25 @@ const addEmployee = async () => {
     mainMenu(); // Return to main menu
 };
 
+// Add Department Function
+const addDepartment = async () => {
+    try { // Try to query database for all departments
+        const { departmentName } = await inquirer.prompt([
+            {
+                type: 'input',
+                name: 'departmentName',
+                message: 'What is the name of the department?'
+            }
+        ]);
+        // Add department to database
+        await getDb().query('INSERT INTO department SET ?', { name: departmentName });
+        console.log('Department added successfully!');
+    } catch (error) { // Catch and display any errors
+        console.error('Error adding department:', error);
+    }
+    mainMenu(); // Return to main menu
+};
+
 mainMenu();
 
 // Listen for server connection
