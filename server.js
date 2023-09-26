@@ -1,7 +1,6 @@
 // Importing dependencies
 const express = require('express');
 const inquirer = require('inquirer');
-const mysql = require('mysql2');
 
 // Setting up port and express app
 const PORT = process.env.PORT || 3001;
@@ -59,7 +58,7 @@ const mainMenu = async () => {
             updateEmployeeRole();
             break;
         case 'Exit':
-            db.end();
+            exit();
             break;
     }
 }
@@ -252,6 +251,11 @@ const updateEmployeeRole = async () => {
         console.error('Error updating employee role:', error);
     }
     mainMenu(); // Return to main menu
+};
+
+// Exit Function
+const exit = () => {
+    process.exit();
 };
 
 
