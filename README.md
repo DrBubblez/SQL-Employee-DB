@@ -3,7 +3,7 @@
 ## Description
 This is a command line application that allows the user to view and manage the departments, roles, and employees in a company.
 ## Demo Video
-[Click Me!]()
+[Click Me!](https://youtu.be/mHa7e0L5vik)
 
 ## Table of Contents
 - [Installation](#installation)
