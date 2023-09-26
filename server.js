@@ -210,6 +210,51 @@ const addRole = async () => {
     mainMenu(); // Return to main menu
 };
 
+// Update Employee Role Function
+const updateEmployeeRole = async () => {
+    try { // Try to query database for all employees
+        const [employees] = await getDb().query('SELECT * FROM employee');
+        const employeeChoices = employees.map(({ id, first_name, last_name }) => ({ name: `${first_name} ${last_name}`, value: id }));
+        const [roles] = await getDb().query('SELECT * FROM role');
+        const roleChoices = roles.map(({ id, title }) => ({ name: title, value: id }));
+        const { employee, role } = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'employee',
+                message: 'Which employee would you like to update?',
+                choices: employeeChoices
+            },
+            {
+                type: 'list',
+                name: 'role',
+                message: 'What is the employee\'s new role?',
+                choices: roleChoices
+            }
+        ]);
+    
+        const [[employeeRole]] = await getDb().query('SELECT role_id FROM employee WHERE id = ?', [employee]);
+
+        // if the old role of the employee was a manager role, and the new role isn't a manager role
+        if (managerIDs.includes(employeeRole.role_id) && !managerIDs.includes(role)) {
+            const index = managerIDs.indexOf(employeeRole.role_id);
+            managerIDs.splice(index, 1);
+        }
+
+        // if the new role is a manager role and the old role wasn't
+        if (!managerIDs.includes(employeeRole.role_id) && managerIDs.includes(role)) {
+            managerIDs.push(role);
+        }
+
+        // Update employee role in database
+        await getDb().query('UPDATE employee SET role_id = ? WHERE id = ?', [role, employee]);
+        console.log('Employee role updated successfully!');
+    } catch (error) { // Catch and display any errors
+        console.error('Error updating employee role:', error);
+    }
+    mainMenu(); // Return to main menu
+};
+
+
 mainMenu();
 
 // Listen for server connection
